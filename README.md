@@ -1,4 +1,4 @@
-# php-custom-error-handler
+# Custom error handler
 
 ![Custom Error Handler](https://github.com/JaxonRailey/php-custom-error-handler/blob/main/handler.jpg?raw=true)
 
