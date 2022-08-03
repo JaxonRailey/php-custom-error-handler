@@ -79,26 +79,26 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
     }
 
     /* Only for PHP >= 8.0 */
-    $type = match($errno) {
-        E_ERROR             => 'Error',
-        E_WARNING           => 'Warning',
-        E_PARSE             => 'Parse',
-        E_NOTICE            => 'Notice',
-        E_CORE_ERROR        => 'Core Error',
-        E_CORE_WARNING      => 'Core Warning',
-        E_COMPILE_ERROR     => 'Compile Error',
-        E_COMPILE_WARNING   => 'Core Warning',
-        E_USER_ERROR        => 'User Error',
-        E_USER_WARNING      => 'User Warning',
-        E_USER_NOTICE       => 'User Notice',
-        E_STRICT            => 'Strict',
-        E_RECOVERABLE_ERROR => 'Recoverable Error',
-        E_DEPRECATED        => 'Deprecated',
-        E_USER_DEPRECATED   => 'User Deprecated',
-        default             => 'Unknown'
-    };
+    // $type = match($errno) {
+    //     E_ERROR             => 'Error',
+    //     E_WARNING           => 'Warning',
+    //     E_PARSE             => 'Parse',
+    //     E_NOTICE            => 'Notice',
+    //     E_CORE_ERROR        => 'Core Error',
+    //     E_CORE_WARNING      => 'Core Warning',
+    //     E_COMPILE_ERROR     => 'Compile Error',
+    //     E_COMPILE_WARNING   => 'Core Warning',
+    //     E_USER_ERROR        => 'User Error',
+    //     E_USER_WARNING      => 'User Warning',
+    //     E_USER_NOTICE       => 'User Notice',
+    //     E_STRICT            => 'Strict',
+    //     E_RECOVERABLE_ERROR => 'Recoverable Error',
+    //     E_DEPRECATED        => 'Deprecated',
+    //     E_USER_DEPRECATED   => 'User Deprecated',
+    //     default             => 'Unknown'
+    // };
 
-    /* For PHP < 8.0
+    //For PHP < 8.0
     switch ($errno) {
         case E_ERROR:             $type = 'Error'; break;
         case E_WARNING:           $type = 'Warning'; break;
@@ -116,7 +116,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
         case E_DEPRECATED:        $type = 'Deprecated'; break;
         case E_USER_DEPRECATED:   $type = 'User Deprecated'; break;
         default:                  $type = 'Unknown'; break;
-    } */
+    }
 
     if ($errno == E_RECOVERABLE_ERROR) {
         if (preg_match('/^Argument (\d)+ passed to (?:(\w+)::)?(\w+)\(\) must be an instance of (\w+), (\w+) given/', $errstr, $match)) {
@@ -126,19 +126,38 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
         }
     }
 
-    echo '<div style="background: #FEEFB3; font-family: monospace; font-size: 12px; letter-spacing: -0.5; color: #9F6000; border: 1px solid #9F6000; margin: 10px; padding: 15px 10px 5px; z-index: 999999;">
+    echo '<div style="position: relative; background: #FEEFB3; font-family: monospace; font-size: 12px; letter-spacing: -0.5; color: #9F6000; border: 2px solid #eac946; margin: 10px; padding: 15px 15px 12px; z-index: 999999;">
     <div style="line-height: 24px; position: relative; top: -4px;">
-    <strong style="line-height: 20px; font-size: 16px;">' . $type . '</strong>
-    <p style="margin: 0">' . $errstr . ' in <strong>file</strong> ' . $errfile . ' on <strong>line</strong> ' . $errline . '</p>
-    </div>
+        <div style="float:left; font-size: 76px; line-height: 76px; padding-right: 15px">&#9888;</div>
+        <div>
+            <p style="font-size: 16px; margin: 0; font-weight: bold">' . $type . '</p>
+            <p style="margin: 0">' . $errstr . '</p>
+            <p style="margin: 0"><strong>line: </strong>' . $errline . ' &middot; ' . $errfile . '</p>
+        </div>
+    </div>';
 
-    <ul style="padding-left: 13px;">';
+    $traces = debug_backtrace();
+    $total  = count($traces) - 1;
 
-        foreach (debug_backtrace() as $trace) {
-            if (isset($trace['file']) && isset($trace['line'])) {
-            echo '<li style="line-height: 20px; font-size: 12px;">' . $trace['file'] . ' on <strong>line</strong> ' . $trace['line'] . '</li>';
+    if ($total) {
+        echo '<style>
+            details.error-handler[open] summary::after { content: " (click to close)"; }
+            details.error-handler:not([open]) summary::after { content: " (click to expand)"; }
+        </style>';
+        echo '<details class="error-handler">
+            <summary style="margin: 10px 0 0; display: block; font-size: 14px; cursor: pointer; outline: none; user-select: none">Backtrace: ' . $total . '</summary>
+            <ul style="padding-left: 13px; margin: 10px 0 0; list-style: circle">';
+            foreach ($traces as $key => $trace) {
+                if (isset($trace['file']) && isset($trace['line']) && $key < $total) {
+                echo '<li style="line-height: 24px; font-size: 12px;">
+                    <strong>line: </strong>
+                    <span style="min-width: 20px; display: inline-block">' . $trace['line'] . '</span>
+                    <span> &ctdot; </span>' . $trace['file'] . '</li>';
+                }
             }
-        }
-
-    echo '</ul></div>';
+            echo '</ul>
+        </details>';
+    }
+    echo '</div>
+    </div>';
 });
