@@ -1,6 +1,6 @@
 # Custom error handler
 
-![Custom Error Handler](https://github.com/JaxonRailey/php-custom-error-handler/blob/main/handler.jpg?raw=true)
+![Custom Error Handler](https://github.com/JaxonRailey/php-custom-error-handler/blob/main/screenshot.png?raw=true)
 
 A super simple, clean and pretty error handler that replace the default error handler of PHP.
 
